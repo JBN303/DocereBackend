@@ -6,6 +6,8 @@ const mongoose = require('mongoose');
 const db = require('./config/db');
 const doctorRoutes = require('./routes/doctorRoutes');
 const userRoutes = require('./routes/userRoutes');
+const patientRoutes = require('./routes/patientRoutes');
+
 
 const app = express();
 
@@ -22,6 +24,10 @@ db.once('open', () => {
 app.use('/api', userRoutes);
 // Use doctorRoutes
 app.use('/api', doctorRoutes);
+// Use patientRoutes
+app.use('/api', patientRoutes);
+// Use puserRoutes...
+
 
 const PORT = process.env.PORT || 5007;
 

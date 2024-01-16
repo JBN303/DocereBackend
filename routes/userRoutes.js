@@ -10,7 +10,7 @@ router.post('/login', async (req, res) => {
     // Check if the user with the provided email and password exists in the database
     const user = await User.findOne({ email,cpass });
     if (!user) {
-      return res.status(200).json({ message: 'Invalid email or password' });
+      return res.status(401).json({message: 'Invalid email or password' });
     }
 
     // If the user exists, consider it as a successful login
