@@ -7,7 +7,7 @@ const doctorSchema = new mongoose.Schema({
     age: Number,
     spec: String,
     edu: String,
-    exp: Number,
+    exp: String,
     lang: String,
     locat: String,
     conslt: String,

@@ -7,7 +7,8 @@ const db = require('./config/db');
 const doctorRoutes = require('./routes/doctorRoutes');
 const userRoutes = require('./routes/userRoutes');
 const patientRoutes = require('./routes/patientRoutes');
-
+const puserRoutes = require('./routes/puserRoutes')
+const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
@@ -27,6 +28,11 @@ app.use('/api', doctorRoutes);
 // Use patientRoutes
 app.use('/api', patientRoutes);
 // Use puserRoutes...
+app.use('/api', puserRoutes);
+// Use adminRoutes
+app.use('/api/admin', adminRoutes);
+
+
 
 
 const PORT = process.env.PORT || 5007;
