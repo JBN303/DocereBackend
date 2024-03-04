@@ -21,16 +21,16 @@ router.post('/plogin', async (req, res) => {
 
 //  status changer 🔽
 
-router.put('/patients/toggle/:id', async (req, res) => {
+router.put('/user/toggle/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const patient = await PUser.findById(id);
-    if (!patient) {
+    const user = await PUser.findById(id);
+    if (!user) {
       return res.status(404).json({ message: 'Patient not found' });
     }
-    patient.status = patient.status === 'active' ? 'inactive' : 'active';
-    const updatedPatient = await patient.save();
-    res.status(200).json(updatedPatient);
+    user.status = user.status === 'active' ? 'inactive' : 'active';
+    const updateduser = await user.save();
+    res.status(200).json(updateduser);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Internal Server Error' });

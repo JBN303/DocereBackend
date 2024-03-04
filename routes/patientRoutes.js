@@ -1,38 +1,38 @@
 const express = require('express');
-const Patient = require('../model/patientmodel'); // Adjust the path accordingly
+const User = require('../model/patientmodel'); // Adjust the path accordingly
 const router = express.Router();
 const mongoose = require('mongoose');
 const Appointment = require('../model/appointmentModel');
 
 router.post('/pnew', async (req, res) => {
   try {
-    const newPatient = new Patient(req.body);
-    const savedPatient = await newPatient.save();
-    res.status(200).send(savedPatient);
+    const newUser = new User(req.body);
+    const savedUser = await newUser.save();
+    res.status(200).send(savedUser);
   } catch (err) {
     res.status(500).send(err);
   }
 });
 
-router.get('/patients', async (req, res) => {
+router.get('/user', async (req, res) => {
   try {
-    const patients = await Patient.find();
-    res.status(200).json(patients);
+    const user = await User.find();
+    res.status(200).json(user);
   } catch (err) {
     res.status(500).send(err);
   }
 });
-router.get('/patients/:id', async (req, res) => {
+router.get('/user/:id', async (req, res) => {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid patient ID' });
     }
-    const patient = await Patient.findById(id);
-    if (!patient) {
+    const user = await User.findById(id);
+    if (!user) {
       return res.status(404).json({ message: 'Patient not found' });
     }
-    res.status(200).json(patient);
+    res.status(200).json(user);
   } catch (error) {
     console.error('Error fetching patient by ID:', error);
     res.status(500).json({ message: 'Internal Server Error' });

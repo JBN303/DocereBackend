@@ -112,15 +112,83 @@ async function convertImageToBase64(filePath) {
   }
 }
 
-// Update doctor profile
-router.put('/doctors/:id', async (req, res) => {
+// Route to upload profile picture
+router.post('/doctors/upload-pic/:id', upload.single('pic'), async (req, res) => {
   const { id } = req.params;
 
   try {
-    const updatedDoctor = await Doctor.findByIdAndUpdate(id, req.body, { new: true });
-    if (!updatedDoctor) {
+    const doctor = await Doctor.findById(id);
+    if (!doctor) {
       return res.status(404).json({ message: 'Doctor not found' });
     }
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const base64Image = await convertImageToBase64(req.file.path);
+    doctor.pic = base64Image;
+    await doctor.save();
+
+    fs.unlinkSync(req.file.path);
+
+    res.status(200).json({ message: 'Profile picture uploaded successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+// Route to upload certificate
+router.post('/doctors/upload-cert/:id', upload.single('cert'), async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const doctor = await Doctor.findById(id);
+    if (!doctor) {
+      return res.status(404).json({ message: 'Doctor not found' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const base64Cert = await convertImageToBase64(req.file.path);
+    doctor.cert = base64Cert;
+    await doctor.save();
+
+    fs.unlinkSync(req.file.path);
+
+    res.status(200).json({ message: 'Certificate uploaded successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+
+// Update doctor profile
+router.put('/updatedoctors/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Find the existing doctor document by ID
+    const existingDoctor = await Doctor.findById(id);
+    
+    if (!existingDoctor) {
+      return res.status(404).json({ message: 'Doctor not found' });
+    }
+
+    // Update only the fields that are present in req.body
+    for (const key in req.body) {
+      if (existingDoctor[key] !== req.body[key]) {
+        existingDoctor[key] = req.body[key];
+      }
+    }
+
+    // Save the updated doctor document
+    const updatedDoctor = await existingDoctor.save();
+
     res.status(200).json(updatedDoctor);
   } catch (err) {
     res.status(500).send(err);
@@ -173,7 +241,7 @@ router.post('/appointments/:id', async (req, res) => {
     if (!doctor) {
       return res.status(404).json({ message: 'Doctor not found' });
     }
-    const { patientId, appno, patientName, age, date, day, purpose , time, msg, patientEmail, patientContactNo } = req.body;
+    const { patientId, patientName, age, date, day, purpose , patientEmail, patientContactNo } = req.body;
 
     // Find selected doctor
     const selectedDoctor = await Doctor.findById(id);
@@ -182,14 +250,11 @@ router.post('/appointments/:id', async (req, res) => {
     const appointment = new Appointment({
       doctorId: id,
       patientId,
-      appno,
       patientName,
       age,
       date,
       day,
       purpose,
-      time,
-      msg,
       doctorName: selectedDoctor.name,
       doctorLocation: selectedDoctor.locat,
       patientEmail, // Include patient email directly
@@ -222,6 +287,34 @@ router.put('/appointments/status/:appointmentId', async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
+
+
+router.get('/appointments/:doctorId', async (req, res) => {
+  try {
+    const { doctorId } = req.params;
+    const appointments = await Appointment.find({ doctorId });
+    res.status(200).json(appointments);
+  } catch (error) {
+    console.error('Error fetching appointments:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+router.get('/appointmentpat/:patientId', async (req, res) => {
+  console.log("sfnaks")
+  
+ 
+  try {
+    const { patientId } = req.params;
+    console.log(patientId)
+    const appointments = await Appointment.find({ patientId });
+    res.status(200).json(appointments);
+  } catch (error) {
+    console.error('Error fetching appointments:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
 // Update appointment details
 router.put('/appointments/:appointmentId', async (req, res) => {
   const { appointmentId } = req.params;
@@ -241,32 +334,20 @@ router.put('/appointments/:appointmentId', async (req, res) => {
 });
 
 
-router.get('/appointments/:doctorId', async (req, res) => {
+// Delete appointment
+router.delete('/appointments/:id', async (req, res) => {
+  const { id } = req.params;
+
   try {
-    const { doctorId } = req.params;
-    const appointments = await Appointment.find({ doctorId });
-    res.status(200).json(appointments);
-  } catch (error) {
-    console.error('Error fetching appointments:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    const deletedAppointment = await Appointment.findByIdAndDelete(id);
+    if (!deletedAppointment) {
+      return res.status(404).json({ message: 'Appointment not found' });
+    }
+    res.status(200).json({ message: 'Appointment deleted successfully' });
+  } catch (err) {
+    res.status(500).send(err);
   }
 });
-
-router.get('/appointmentpat/:patientId', async (req, res) => {
-  
-  
- 
-  try {
-    const { patientId } = req.params;
-    
-    const appointments = await Appointment.find({ patientId });
-    res.status(200).json(appointments);
-  } catch (error) {
-    console.error('Error fetching appointments:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
-  }
-});
-
 
 
 /// image 

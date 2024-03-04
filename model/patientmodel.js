@@ -1,7 +1,7 @@
 // models/patientModel.js
 const mongoose = require('mongoose');
 
-const patientSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
     Name: String,
     Address: String,
     Phone: Number,
@@ -13,6 +13,6 @@ const patientSchema = new mongoose.Schema({
     status: { type: String, default: 'Inactive' }, // Add the status field
 });
 
-const Patient = mongoose.model('Patient', patientSchema);
+const User = mongoose.model('User', userSchema);
 
-module.exports = Patient;
+module.exports = User;
